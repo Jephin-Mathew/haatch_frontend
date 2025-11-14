@@ -4,15 +4,10 @@ import { loadRazorpay } from "../utils/razorpay";
 
 function Cart() {
   const [cart, setCart] = useState([]);
-  const [message, setMessage] = useState("");
-
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    if (!token) {
-      window.location.href = "/login";
-      return;
-    }
+    if (!token) return (window.location.href = "/login");
 
     axiosClient
       .get("/cart", { headers: { Authorization: `Bearer ${token}` } })
@@ -24,12 +19,15 @@ function Cart() {
     await axiosClient.delete(`/cart/${courseId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
     setCart(cart.filter((c) => c.course_id !== courseId));
   };
 
+  const total = cart.reduce((sum, i) => sum + i.course.price_cents / 100, 0);
+
   const handlePayment = async () => {
-    const res = await loadRazorpay();
-    if (!res) return alert("Failed to load Razorpay SDK");
+    const ok = await loadRazorpay();
+    if (!ok) return;
 
     try {
       const orderRes = await axiosClient.post(
@@ -40,67 +38,66 @@ function Cart() {
 
       const { razorpay_order_id, amount, key } = orderRes.data;
 
-      const options = {
+      const rzp = new window.Razorpay({
         key,
         amount,
         currency: "INR",
-        name: "Haatch Course Portal",
+        name: "Haatch Learning",
         description: "Course Purchase",
         order_id: razorpay_order_id,
-        handler: function (response) {
+        handler: () => {
           alert("Payment successful!");
           setCart([]);
         },
-        prefill: {
-          name: "Test User",
-          email: "test@example.com",
+        theme: {
+          color: "#6A5ACD",
         },
-        theme: { color: "#3399cc" },
-      };
+      });
 
-      const paymentObject = new window.Razorpay(options);
-      paymentObject.open();
+      rzp.open();
     } catch (err) {
       console.error(err);
       alert("Payment failed.");
     }
   };
 
-  const total = cart.reduce(
-    (sum, item) => sum + item.course.price_cents / 100,
-    0
-  );
-
   return (
     <div>
-      <h2>My Cart</h2>
+      <h2 className="fw-bold mb-4">Your Cart</h2>
+
       {cart.length === 0 ? (
-        <p>No items in cart.</p>
+        <p className="text-muted">Your cart is empty.</p>
       ) : (
         <>
-          <ul className="list-group mb-3">
+          <ul className="list-group mb-4 shadow-sm">
             {cart.map((item) => (
               <li
                 key={item.id}
                 className="list-group-item d-flex justify-content-between align-items-center"
               >
-                <span>{item.course.title}</span>
-                <span>
-                  ₹{item.course.price_cents / 100}
+                <span className="fw-semibold">{item.course.title}</span>
+
+                <div>
+                  <span className="fw-bold me-3">
+                    ₹{item.course.price_cents / 100}
+                  </span>
                   <button
+                    className="btn btn-sm btn-outline-danger"
                     onClick={() => removeItem(item.course_id)}
-                    className="btn btn-sm btn-danger ms-3"
                   >
                     Remove
                   </button>
-                </span>
+                </div>
               </li>
             ))}
           </ul>
-          <h5>Total: ₹{total}</h5>
-          <button className="btn btn-primary" onClick={handlePayment}>
-            Pay Now
-          </button>
+
+          <div className="d-flex justify-content-between align-items-center">
+            <h4>Total: ₹{total}</h4>
+            <button className="btn btn-success btn-lg" onClick={handlePayment}>
+              Proceed to Payment
+            </button>
+          </div>
         </>
       )}
     </div>
