@@ -1,70 +1,267 @@
-# Getting Started with Create React App
+# Haatch Learning -- Frontend (React)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the **React frontend** for the **Online Course Purchase Portal** task for
 
-## Available Scripts
+**Haatch Interactive Pvt. Ltd.**
 
-In the project directory, you can run:
+The frontend provides:
 
-### `npm start`
+- User Registration & Login (JWT-based)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- View all available courses
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Add to Cart and purchase using **Razorpay Checkout**
 
-### `npm test`
+- View & access purchased courses ("My Courses")
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Full admin panel:
 
-### `npm run build`
+  - Dashboard
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  - User Management
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  - Orders & Order Details
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  - Course Management (Create, Edit, Delete)
 
-### `npm run eject`
+This project consumes the Laravel API from the backend repo.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🧰 Tech Stack
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **React 19**
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- **React Router v7**
 
-## Learn More
+- **Axios**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **Bootstrap 5**
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- **JWT Authentication**
 
-### Code Splitting
+- **Razorpay Checkout (client-side)**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 🚀 Getting Started
 
-### Making a Progressive Web App
+### 1️⃣ Clone the repo
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
 
-### Advanced Configuration
+git clone https://github.com/Jephin-Mathew/haatch_frontend.git
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+cd haatch_frontend
 
-### Deployment
+2️⃣ Install dependencies
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+bash
 
-### `npm run build` fails to minify
+Copy code
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+npm install
+
+This project uses:
+
+Node v18+
+
+NPM v10+
+
+3️⃣ Create .env
+
+Create .env in the root:
+
+ini
+
+Copy code
+
+REACT_APP_API_URL=http://127.0.0.1:8000/api
+
+REACT_APP_RAZORPAY_KEY=rzp_test_1234567890
+
+The Razorpay key must match the backend .env key
+
+RAZORPAY_KEY_ID=...
+
+Your frontend uses this to open the payment gateway.
+
+4️⃣ Start the development server
+
+bash
+
+Copy code
+
+npm start
+
+The app will be available at:
+
+arduino
+
+Copy code
+
+http://localhost:3000
+
+🔗 Backend API Dependency
+
+This frontend requires the Laravel backend running:
+
+bash
+
+Copy code
+
+https://github.com/Jephin-Mathew/haatch_backend
+
+Backend must be running on:
+
+cpp
+
+Copy code
+
+http://127.0.0.1:8000
+
+🔐 Authentication Flow
+
+After login, JWT token is stored in localStorage
+
+Axios automatically attaches:
+
+makefile
+
+Copy code
+
+Authorization: Bearer <token>
+
+Protected pages include:
+
+/courses
+
+/cart
+
+/my-courses
+
+All admin routes (via ProtectedAdminRoute)
+
+💳 Payment Flow (Razorpay)
+
+User adds items to the cart
+
+User clicks Pay Now
+
+Frontend calls backend /create-order
+
+Backend returns:
+
+razorpay_order_id
+
+amount
+
+key
+
+Frontend opens Razorpay popup
+
+Razorpay calls backend webhook
+
+Backend:
+
+Marks order as paid
+
+Creates purchase entries
+
+Clears the cart
+
+User sees purchased course under /my-courses
+
+✔️ Test Card Numbers
+
+Network  Card Number  CVV  Expiry
+
+Mastercard  2305 3242 5784 8228  Any  Any future date
+
+Visa  4386 2894 0766 0153  Any  Any future date
+
+🧪 Scripts
+
+Start development:
+
+bash
+
+Copy code
+
+npm start
+
+Build for production:
+
+bash
+
+Copy code
+
+npm run build
+
+Run tests:
+
+bash
+
+Copy code
+
+npm test
+
+🌐 Available Pages
+
+Student Features
+
+Page  Path  Description
+
+Login  / or /login  JWT authentication
+
+Register  /register  Create account
+
+Courses  /courses  Browse & buy courses
+
+Cart  /cart  Checkout using Razorpay
+
+My Courses  /my-courses  View purchased courses
+
+Course Viewer  /course/:slug  View course content
+
+Admin Features
+
+Page  Description
+
+Dashboard  Overview navigation
+
+Manage Courses  Create/edit/delete courses
+
+Manage Users  View/delete users & edit roles
+
+View Orders  See all orders
+
+Order Details  Full order breakdown
+
+💡 Notes
+
+Navbar is hidden on /, /login, /register
+
+Role-based redirection:
+
+Students → /courses
+
+Admins → /admin/dashboard
+
+Clean UI using Bootstrap + custom layout enhancements
+
+📝 Submission Summary
+
+Frontend Framework: React 19
+
+Routing: React Router 7
+
+UI: Bootstrap 5
+
+State / API: Axios
+
+Payments: Razorpay Checkout
+
+JWT Auth: Integrated with Laravel backend
