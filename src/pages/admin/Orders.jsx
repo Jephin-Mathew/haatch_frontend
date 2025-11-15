@@ -36,7 +36,6 @@ export default function Orders() {
     <div className="container mt-4">
       <h2 className="fw-bold mb-3">All Orders</h2>
 
-      {/* Search Bar */}
       <input
         type="text"
         placeholder="Search by user or status..."
@@ -45,7 +44,6 @@ export default function Orders() {
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {/* Table */}
       {filtered.length === 0 ? (
         <p>No orders found.</p>
       ) : (

@@ -30,20 +30,19 @@ export default function OrderDetails() {
 
   return (
     <div className="container mt-4">
-      <h2 className="fw-bold">Order #{order.id}</h2>
+      <h2 className="fw-bold">Order {order.id}</h2>
       <hr />
 
-      {/* User Section */}
+
       <div className="card shadow-sm p-4 mb-4">
-        <h4 className="mb-3">👤 User Information</h4>
+        <h4 className="mb-3"> User Information</h4>
 
         <p><b>Name:</b> {order.user?.name}</p>
         <p><b>Email:</b> {order.user?.email}</p>
       </div>
 
-      {/* Order Items */}
       <div className="card shadow-sm p-4 mb-4">
-        <h4 className="mb-3">🛒 Order Items</h4>
+        <h4 className="mb-3"> Order Items</h4>
 
         {order.items.length === 0 ? (
           <p>No items found.</p>
@@ -64,9 +63,9 @@ export default function OrderDetails() {
         )}
       </div>
 
-      {/* Payment Info */}
+
       <div className="card shadow-sm p-4">
-        <h4 className="mb-3">💳 Payment Information</h4>
+        <h4 className="mb-3"> Payment Information</h4>
 
         <p>
           <b>Status: </b>

@@ -19,15 +19,15 @@ function Navbar() {
 
         <div className="d-flex">
           <Link className="nav-link me-4" to="/courses">Courses</Link>
-          <Link className="nav-link me-4" to="/cart">🛒 Cart</Link>
+          {token && (
+  <Link className="nav-link me-4" to="/my-courses">My Courses</Link>
+)}
+          <Link className="nav-link me-4" to="/cart">Cart</Link>
 
-          {!token ? (
-            <>
-              <Link className="btn btn-outline-primary me-2" to="/login">Login</Link>
-              <Link className="btn btn-primary" to="/register">Sign Up</Link>
-            </>
-          ) : (
-            <button className="btn btn-danger" onClick={logout}>Logout</button>
+          {token && (
+            <button className="btn btn-danger" onClick={logout}>
+              Logout
+            </button>
           )}
         </div>
       </div>

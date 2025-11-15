@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import axiosClient from "../api/axiosClient";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-function Login() {
-  const navigate = useNavigate();
+export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -13,64 +11,77 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
     try {
       const res = await axiosClient.post("/auth/login", form);
-
-      // Store token & user info
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      alert("Login successful!");
-
-      // Redirect based on role
       if (res.data.user.role === "admin") {
-        navigate("/admin/dashboard");
+        window.location.href = "/admin/dashboard";
       } else {
-        navigate("/courses");
+        window.location.href = "/courses";
       }
     } catch (err) {
-      console.error(err);
       alert("Invalid email or password");
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="container mt-4" style={{ maxWidth: "400px" }}>
-      <h2 className="mb-3">Login</h2>
+    <div
+      className="d-flex justify-content-center align-items-center bg-light"
+      style={{
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        className="card shadow-lg p-4"
+        style={{
+          width: "380px",
+          borderRadius: "12px",
+        }}
+      >
+        <h3 className="text-center mb-4">Welcome Back</h3>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="email"
-          placeholder="Email"
-          type="email"
-          onChange={handleChange}
-          required
-          className="form-control mb-3"
-        />
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Email</label>
+            <input
+              type="email"
+              name="email"
+              onChange={handleChange}
+              className="form-control"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
 
-        <input
-          name="password"
-          placeholder="Password"
-          type="password"
-          onChange={handleChange}
-          required
-          className="form-control mb-3"
-        />
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Password</label>
+            <input
+              type="password"
+              name="password"
+              onChange={handleChange}
+              className="form-control"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
 
-        <button
-          type="submit"
-          className="btn btn-primary w-100"
-          disabled={loading}
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+          <button type="submit" className="btn btn-primary w-100 mt-2">
+            Login
+          </button>
+        </form>
+
+        <hr />
+
+        <p className="text-center">
+          Don't have an account?
+          <br />
+          <Link to="/register" className="fw-bold text-primary">
+            Create a new account
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
-
-export default Login;

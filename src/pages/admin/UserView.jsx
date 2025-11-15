@@ -11,30 +11,38 @@ export default function UserView() {
       .get(`/admin/users/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
-      .then((res) => setUser(res.data));
-  }, []);
+      .then((res) => setUser(res.data))
+      .catch((err) => console.error(err));
+  }, [id]);
 
   if (!user) return <p>Loading...</p>;
 
+  const purchases = user.purchases || [];
+
   return (
     <div>
-      <h2>User Details</h2>
+      <h2 className="fw-bold mb-3">User Details</h2>
 
-      <p><strong>Name:</strong> {user.name}</p>
-      <p><strong>Email:</strong> {user.email}</p>
-      <p><strong>Role:</strong> {user.role}</p>
-      <p><strong>Joined:</strong> {new Date(user.created_at).toLocaleDateString()}</p>
+      <div className="card shadow-sm p-3 mb-4">
+        <p><strong>Name:</strong> {user.name}</p>
+        <p><strong>Email:</strong> {user.email}</p>
+        <p><strong>Role:</strong> {user.role}</p>
+        <p><strong>Joined:</strong> {new Date(user.created_at).toLocaleDateString()}</p>
+      </div>
 
-      <h3 className="mt-4">Purchases</h3>
+      <h4 className="fw-semibold">Purchases</h4>
 
-      {user.purchases.length === 0 ? (
-        <p>No purchases yet.</p>
+      {purchases.length === 0 ? (
+        <div className="alert alert-secondary">No purchases yet.</div>
       ) : (
-        <ul>
-          {user.purchases.map((p) => (
-            <li key={p.id}>
-              Course ID: {p.course_id}, Order: {p.order_id}, Date:{" "}
-              {new Date(p.acquired_at).toLocaleString()}
+        <ul className="list-group">
+          {purchases.map((p) => (
+            <li className="list-group-item" key={p.id}>
+              <strong>Course:</strong> {p.course_id}  
+              <br />
+              <strong>Order:</strong> {p.order_id}
+              <br />
+              <strong>Date:</strong> {new Date(p.acquired_at).toLocaleString()}
             </li>
           ))}
         </ul>

@@ -2,15 +2,19 @@ import React, { useEffect, useState } from "react";
 import axiosClient from "../api/axiosClient";
 import { loadRazorpay } from "../utils/razorpay";
 
-function Cart() {
+export default function Cart() {
   const [cart, setCart] = useState([]);
+  const [message, setMessage] = useState("");
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     if (!token) return (window.location.href = "/login");
 
     axiosClient
-      .get("/cart", { headers: { Authorization: `Bearer ${token}` } })
+      .get("/cart", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => setCart(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -23,11 +27,9 @@ function Cart() {
     setCart(cart.filter((c) => c.course_id !== courseId));
   };
 
-  const total = cart.reduce((sum, i) => sum + i.course.price_cents / 100, 0);
-
   const handlePayment = async () => {
-    const ok = await loadRazorpay();
-    if (!ok) return;
+    const sdkLoaded = await loadRazorpay();
+    if (!sdkLoaded) return alert("Failed to load Razorpay SDK");
 
     try {
       const orderRes = await axiosClient.post(
@@ -36,72 +38,90 @@ function Cart() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const { razorpay_order_id, amount, key } = orderRes.data;
+      const { order_id, razorpay_order_id, amount, key } = orderRes.data;
 
-      const rzp = new window.Razorpay({
+      const options = {
         key,
         amount,
         currency: "INR",
-        name: "Haatch Learning",
+        name: "Haatch Course Portal",
         description: "Course Purchase",
         order_id: razorpay_order_id,
-        handler: () => {
-          alert("Payment successful!");
-          setCart([]);
+        handler: async function () {
+          alert("Payment Success!");
+
+          try {
+            await axiosClient.post(
+              `/orders/${order_id}/complete-test`,
+              {},
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            alert("Order marked as paid! Courses unlocked.");
+
+
+            setCart([]);
+
+
+            window.location.href = "/my-courses";
+          } catch (error) {
+            console.error("Error completing order:", error);
+            alert("Payment completed, but failed to unlock course locally.");
+          }
         },
         theme: {
-          color: "#6A5ACD",
+          color: "#3399cc",
         },
-      });
+      };
 
-      rzp.open();
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
     } catch (err) {
       console.error(err);
       alert("Payment failed.");
     }
   };
 
+  const total = cart.reduce(
+    (sum, item) => sum + item.course.price_cents / 100,
+    0
+  );
+
   return (
     <div>
-      <h2 className="fw-bold mb-4">Your Cart</h2>
+      <h2 className="fw-bold mb-3">My Cart</h2>
 
       {cart.length === 0 ? (
-        <p className="text-muted">Your cart is empty.</p>
+        <p>No items in cart.</p>
       ) : (
         <>
-          <ul className="list-group mb-4 shadow-sm">
+          <ul className="list-group mb-3">
             {cart.map((item) => (
               <li
                 key={item.id}
                 className="list-group-item d-flex justify-content-between align-items-center"
               >
-                <span className="fw-semibold">{item.course.title}</span>
-
-                <div>
-                  <span className="fw-bold me-3">
-                    ₹{item.course.price_cents / 100}
-                  </span>
+                <span>{item.course.title}</span>
+                <span>
+                  ₹{item.course.price_cents / 100}
                   <button
-                    className="btn btn-sm btn-outline-danger"
                     onClick={() => removeItem(item.course_id)}
+                    className="btn btn-sm btn-danger ms-3"
                   >
                     Remove
                   </button>
-                </div>
+                </span>
               </li>
             ))}
           </ul>
 
-          <div className="d-flex justify-content-between align-items-center">
-            <h4>Total: ₹{total}</h4>
-            <button className="btn btn-success btn-lg" onClick={handlePayment}>
-              Proceed to Payment
-            </button>
-          </div>
+          <h5>Total: ₹{total}</h5>
+
+          <button className="btn btn-primary mt-3" onClick={handlePayment}>
+            Pay Now
+          </button>
         </>
       )}
     </div>
   );
 }
-
-export default Cart;
